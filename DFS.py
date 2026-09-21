@@ -7,24 +7,46 @@ grid = [
     ['.', '.', '.', '.', '.', 'G']
 ]
 
-start, goal = (0, 0), (5, 5)
-stack = [(start, [start])]
-visited = {start}
+start = (0, 0)
+goal = (5, 5)
 
-while stack:
-    (r, c), path = stack.pop()
+# Up, Down, Left, Right
+moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-    if (r, c) == goal:
-        print("Path:", path)
-        print("Steps:", len(path) - 1)
-        break
 
-    for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]:
-        nr, nc = r + dr, c + dc
+def dfs():
+    stack = [(start, [start])]
+    visited = {start}
+    expanded = 0
 
-        if (0 <= nr < 6 and 0 <= nc < 6
-                and grid[nr][nc] != '#'
-                and (nr, nc) not in visited):
+    while stack:
+        current, path = stack.pop()
+        expanded += 1
 
-            visited.add((nr, nc))
-            stack.append(((nr, nc), path + [(nr, nc)]))
+        if current == goal:
+            return path, expanded
+
+        r, c = current
+
+        # reversed because Stack is LIFO
+        for dr, dc in reversed(moves):
+            nr, nc = r + dr, c + dc
+
+            if (0 <= nr < 6 and
+                0 <= nc < 6 and
+                grid[nr][nc] != '#' and
+                (nr, nc) not in visited):
+
+                visited.add((nr, nc))
+                stack.append(((nr, nc), path + [(nr, nc)]))
+
+    return None, expanded
+
+
+path, expanded = dfs()
+
+print("DFS path:")
+print(path)
+
+print("Path cost:", len(path) - 1)
+print("Nodes expanded:", expanded)
